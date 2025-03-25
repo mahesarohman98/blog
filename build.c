@@ -90,7 +90,6 @@ parse_post(const char *filepath, struct Post *post, char *md_buf, size_t *md_len
     int skip = 0;
     size_t md_pos = 0;
     while (fgets(line, sizeof(line), fp)) {
-        // printf("%d> %s", line[0] == '\n', line);
         if (strncmp(line, "title:", 6) == 0) {
             sscanf(line + 6, " %[^\n]", post->title);
             continue;
