@@ -1,0 +1,12 @@
+# Ignore build and public directories
+/build/
+/public/
+
+# Ignore compiled binaries
+/build
+
+# Ignore backup and temporary files
+*.bak
+*.swp
+*.swo
+*~
