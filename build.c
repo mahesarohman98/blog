@@ -1,4 +1,3 @@
-#include <strings.h>
 #define _POSIX_C_SOURCE 200809L
 
 #include <sys/wait.h>
@@ -73,42 +72,15 @@ die(char *fmt, ...)
 	exit(1);
 }
 
-void copy_css(void) {
-    system("cp -r css public/");
-}
-
 void 
-hexdump(const char *buf, size_t len) {
-    size_t i, j;
-    for (i = 0; i < len; i += 16) {
-        printf("%08zx  ", i); /* offset */
-
-        /* Print hex bytes */
-        for (j = 0; j < 16; j++) {
-            if (i + j < len)
-                printf("%02x ", (unsigned char)buf[i + j]);
-            else
-                printf("   ");
-        }
-
-        printf(" ");
-
-        /* Print ASCII */
-        for (j = 0; j < 16; j++) {
-            if (i + j < len) {
-                unsigned char c = buf[i + j];
-                printf("%c", (c >= 32 && c <= 126) ? c : '.'); /* printable char or dot */
-            }
-        }
-
-        printf("\n");
-    }
+copy_css(void) {
+    system("cp -r css public/");
 }
 
 void 
 parse_post(const char *filepath, struct Post *post, char *md_buf, size_t *md_len) {
     FILE *fp = fopen(filepath, "r");
-    if (!fp) return;
+    if (!fp) die("fopen: %s", filepath);
 
     const char *fname = filepath + strlen(PAGES_DIR"/posts/");
     size_t name_len = strlen(fname)-3;
@@ -202,7 +174,7 @@ build_post(const struct Post *post, const char *md_buf, const size_t md_len){
     run_smu(md_buf, md_len, html_buf, &html_len);
 
     out = fopen(outpath, "w");
-    if (!out) return;
+    if (!out) die("fopen: %s", outpath);
 
     fprintf(out, html_header, post->title);
     fprintf(out, "<h1>%s</h1><p><strong>Date:</strong> %s <br> <strong>Tags:</strong> %s</p>",
@@ -217,7 +189,7 @@ build_post(const struct Post *post, const char *md_buf, const size_t md_len){
 void
 build_index_post(){
     FILE *in = fopen(PAGES_DIR"/posts/index.md", "r");
-    if (!in) return;
+    if (!in) die("fopen: %s", PAGES_DIR"/posts/index.md");
     
     char md_buf[MAX_MD];
     size_t md_len = fread(md_buf, 1, MAX_MD - 1, in);
@@ -230,7 +202,7 @@ build_index_post(){
     run_smu(md_buf, md_len, html_buf, &html_len);
 
     FILE *out = fopen(OUTPUT_DIR "/posts/index.html", "w");
-    if (!out) return;
+    if (!out) die("fopen: %s", OUTPUT_DIR "/posts/index.html");
 
     fprintf(out, html_header, "All Post");
     fwrite(html_buf, 1, html_len, out);
@@ -249,7 +221,7 @@ build_index_post(){
 void 
 build_index(void) {
     FILE *in = fopen(PAGES_DIR"/index.md", "r");
-    if (!in) return;
+    if (!in) die("fopen: %s", PAGES_DIR"/index.md");
     
     char md_buf[MAX_MD];
     size_t md_len = fread(md_buf, 1, MAX_MD - 1, in);
@@ -262,7 +234,7 @@ build_index(void) {
     run_smu(md_buf, md_len, html_buf, &html_len);
 
     FILE *out = fopen(OUTPUT_DIR "/index.html", "w");
-    if (!out) return;
+    if (!out) die("fopen: %s", OUTPUT_DIR "/index.html");
 
     fprintf(out, html_header, "Mahesa Rohman");
     fwrite(html_buf, 1, html_len, out);
@@ -283,7 +255,7 @@ build_index(void) {
 void 
 build_about(void) {
     FILE *in = fopen(PAGES_DIR"/about/index.md", "r");
-    if (!in) return;
+    if (!in) die("fopen: %s", PAGES_DIR"/about/index.md");
     
     char md_buf[MAX_MD];
     size_t md_len = fread(md_buf, 1, MAX_MD - 1, in);
@@ -296,19 +268,13 @@ build_about(void) {
     run_smu(md_buf, md_len, html_buf, &html_len);
 
     FILE *out = fopen(OUTPUT_DIR "/about/index.html", "w");
-    if (!out) return;
+    if (!out) die("fopen: %s", OUTPUT_DIR "/about/index.html");;
 
     fprintf(out, html_header, "Mahesa Rohman");
     fwrite(html_buf, 1, html_len, out);
 
     fprintf(out, html_footer, NULL);
     fclose(out);
-}
-
-void
-usage(char *argv0)
-{
-	die("usage: %s post-name", argv0);
 }
 
 int 
@@ -325,7 +291,7 @@ main () {
     copy_css();
 
     DIR *dir = opendir(PAGES_DIR "/posts");
-    if (!dir) return 1;
+    if (!dir)  die("opendir posts");
 
     char md_buf[MAX_MD];
     size_t md_len;
@@ -343,7 +309,6 @@ main () {
         post_count++;
     }
     closedir(dir);
-
 
     qsort(posts, post_count, sizeof(struct Post), compare_posts);
 
