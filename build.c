@@ -23,21 +23,25 @@ char *html_header =
 	"<html lang=\"en\">\n"
 	"<head>\n"
 	"\t<meta charset=\"UTF-8\"/>\n"
+    "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
 	"\t<title>%s</title>\n"
 	"\t<link rel=\"stylesheet\" href=\"/css/style.css\">\n"
 	"</head>\n"
-    "<header><nav><a href='#menu'>Menu</a></nav></header>"
-	"<body>\n";
+	"<body>\n"
+    "<header id=\"top\"><nav><a href='#menu'>Menu ↓</a></nav></header>"
+    "<main>\n";
 
 char *html_footer = 
-    "<footer role='contentinfo'>"
-        "<nav id='menu'>"
-            "<ul>"
-                "<li><a href='/'>Home</a></li>"
-                "<li><a href='/about'>About</a></li>"
-                "<li><a href='/posts'>Posts</a></li>"
-            "<ul>"
-        "</nav>"
+    "</main>"
+    "<footer role=\"contentinfo\">\n"
+        "<nav id=\"menu\">\n"
+            "<ul>\n"
+                "<li><a href=\"/\">Home</a></li>\n"
+                "<li><a href=\"/about\">About</a></li>\n"
+                "<li><a href=\"/posts\">Posts</a></li>\n"
+                "<li><a href='#top'>↑ Top</a></li>\n"
+            "</ul>\n"
+        "</nav>\n"
     "</footer>"
     "</body>\n"
     "</html>\n";
@@ -206,9 +210,9 @@ build_index_post(){
     fprintf(out, html_header, "All Post");
     fwrite(html_buf, 1, html_len, out);
 
-    fprintf(out, "<ul class='posts'>");
+    fprintf(out, "<ul class=\"posts\">");
     for(int i=0; i <post_count; ++i) {
-        fprintf(out, "<li><span>%s</span><a href='/posts/%s.html'>%s</ahref></li>", posts[i].date, posts[i].filename, posts[i].title);
+        fprintf(out, "<li><span>%s</span><a href=\"/posts/%s.html\">%s</a></li>", posts[i].date, posts[i].filename, posts[i].title);
     }
     fprintf(out, "</ul>");
 
@@ -242,10 +246,10 @@ build_index(void) {
     fprintf(out, "<ul class='posts'>");
     for(int i=0; i <post_count; ++i) {
         if (i > 5) break;
-        fprintf(out, "<li><span>%s</span><a href='/posts/%s.html'>%s</ahref></li>", posts[i].date, posts[i].filename, posts[i].title);
+        fprintf(out, "<li><span>%s</span><a href='/posts/%s.html'>%s</a></li>", posts[i].date, posts[i].filename, posts[i].title);
     }
     fprintf(out, "</ul>");
-    fprintf(out, "<p><a href='/posts'>View all posts</href></p>");
+    fprintf(out, "<p><a href='/posts'>View all posts</a></p>");
 
     fprintf(out, html_footer, NULL);
     fclose(out);
