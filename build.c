@@ -39,6 +39,7 @@ char *html_footer =
                 "<li><a href=\"/\">Home</a></li>\n"
                 "<li><a href=\"/about\">About</a></li>\n"
                 "<li><a href=\"/posts\">Posts</a></li>\n"
+                "<li><a href=\"/resume\">Resume</a></li>\n"
                 "<li><a href='#top'>↑ Top</a></li>\n"
             "</ul>\n"
         "</nav>\n"
@@ -273,13 +274,37 @@ build_about(void) {
     FILE *out = fopen(OUTPUT_DIR "/about/index.html", "w");
     if (!out) die("fopen: %s", OUTPUT_DIR "/about/index.html");;
 
-    fprintf(out, html_header, "Mahesa Rohman");
+    fprintf(out, html_header, "About");
     fwrite(html_buf, 1, html_len, out);
 
     fprintf(out, html_footer, NULL);
     fclose(out);
 }
 
+void 
+build_resume(void) {
+    FILE *in = fopen(PAGES_DIR"/resume/index.md", "r");
+    if (!in) die("fopen: %s", PAGES_DIR"/resume/index.md");
+    
+    char md_buf[MAX_MD];
+    size_t md_len = fread(md_buf, 1, MAX_MD - 1, in);
+    md_buf[md_len] = '\0';
+
+    fclose(in);
+
+    char html_buf[MAX_MD];
+    size_t html_len;
+    run_smu(md_buf, md_len, html_buf, &html_len);
+
+    FILE *out = fopen(OUTPUT_DIR "/resume/index.html", "w");
+    if (!out) die("fopen: %s", OUTPUT_DIR "/resume/index.html");;
+
+    fprintf(out, html_header, "Mahesa Rohman");
+    fwrite(html_buf, 1, html_len, out);
+
+    fprintf(out, html_footer, NULL);
+    fclose(out);
+}
 int 
 compare_posts(const void *a, const void *b) {
     const struct Post *pa = a, *pb = b;
@@ -291,6 +316,7 @@ main () {
     mkdir(OUTPUT_DIR, 0755);
     mkdir(OUTPUT_DIR"/posts", 0755);   
     mkdir(OUTPUT_DIR"/about", 0755);   
+    mkdir(OUTPUT_DIR"/resume", 0755);   
     copy_css();
 
     DIR *dir = opendir(PAGES_DIR "/posts");
@@ -320,6 +346,8 @@ main () {
     build_index();
 
     build_about();
+
+    build_resume();
 
     return 0;
 }
